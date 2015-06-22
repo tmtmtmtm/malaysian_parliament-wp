@@ -71,11 +71,12 @@ def scrape_oldstyle_list(term, url)
     data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
 end
 
+# With more time I'd harmonise these two functions, but for a largely
+# one-off scraper it barely seems worth it...
 def scrape_newstyle_list(term, url)
   puts "Fetching Parliament #{term}"
   noko = noko_for(url)
@@ -97,7 +98,6 @@ def scrape_newstyle_list(term, url)
     data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    puts data[:area]
     ScraperWiki.save_sqlite([:name, :term], data)
   end
 end
