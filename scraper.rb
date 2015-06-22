@@ -6,7 +6,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'uri'
 
-require 'pry'
+# require 'pry'
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
@@ -84,7 +84,6 @@ def scrape_newstyle_list(term, url)
     tds = row.css('td')
     member = tds[2].at_xpath('a') or next
     (party, coalition) = party_and_coalition(tds[3])
-    binding.pry if member.text.strip == 'Takiyuddin Hassan'
     data = { 
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
