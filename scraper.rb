@@ -74,6 +74,7 @@ def scrape_oldstyle_list(term, url)
       source: url,
     }
     data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
+    data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
     ScraperWiki.save_sqlite([:name, :term], data)
@@ -100,6 +101,7 @@ def scrape_newstyle_list(term, url)
       source: url,
     }
     data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
+    data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
     ScraperWiki.save_sqlite([:name, :term], data)
