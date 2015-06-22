@@ -6,7 +6,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'uri'
 
-# require 'pry'
+require 'pry'
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
@@ -40,7 +40,12 @@ def wikilink(a)
 end
 
 def wikiname(a)
-  URI.unescape(a.attr('href').to_s).split('/').last.gsub('_',' ').gsub(/ \([^\)]+\)/,'').strip
+  href = URI.unescape(a.attr('href').to_s).split('/').last
+  if href.include? 'action=edit'
+    require 'cgi'
+    href = CGI.parse(URI.parse(href).query)['title'].first
+  end
+  href.gsub('_',' ').gsub(/ \([^\)]+\)/,'').strip
 end
 
 def party_and_coalition(td)
@@ -104,8 +109,6 @@ end
 newstyle.each do |term, url|
   scrape_newstyle_list(term, url)
 end
-
-exit
 
 oldstyle.each do |term, url|
   scrape_oldstyle_list(term, url)
