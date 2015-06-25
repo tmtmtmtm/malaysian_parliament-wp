@@ -67,6 +67,7 @@ def scrape_oldstyle_list(term, url)
       name: member.text.strip,
       state: tds[0].text.strip,
       constituency: tds[2].text.strip,
+      constituency_id: tds[1].text.strip,
       wikipedia: wikilink(member),
       party_id: party[:id],
       party: party[:name],
@@ -77,6 +78,7 @@ def scrape_oldstyle_list(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
+    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
 end
@@ -94,6 +96,7 @@ def scrape_newstyle_list(term, url)
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
       constituency: tds[1].text.strip,
+      constituency_id: tds[0].text.strip,
       wikipedia: wikilink(member),
       party_id: party[:id],
       party: party[:name],
@@ -104,6 +107,7 @@ def scrape_newstyle_list(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
+    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
 end
