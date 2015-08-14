@@ -44,7 +44,7 @@ end
 def party_and_coalition(td)
   unknown = { id: "unknown", name: "unknown" }
   return [unknown, unknown] unless td
-  expand = ->(a) { { id: a.text, name: a.xpath('@title').text.gsub('(page does not exist)','').strip } }
+  expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
   return [expand.(td.css('a')), nil] if td.css('a').count == 1 
   return td.css('a').reverse.map { |a| expand.(a) }
 end
