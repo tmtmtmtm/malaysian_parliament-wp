@@ -62,6 +62,7 @@ def scrape_term(term, url)
     next unless member
     (party, coalition) = party_and_coalition(tds[3])
     data = { 
+      id: member.attr('title').downcase.gsub(/ /,'-').gsub('-(page-does-not-exist)',''),
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
       constituency: tds[1].text.strip,
@@ -76,7 +77,7 @@ def scrape_term(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    ScraperWiki.save_sqlite([:name, :term], data)
+    ScraperWiki.save_sqlite([:id, :term], data)
   end
 end
 
