@@ -33,22 +33,18 @@ end
 @WIKI = 'http://en.wikipedia.org'
 def wikilink(a)
   return if a.attr('class') == 'new' 
-  a.attr('title')
+  URI.join(@WIKI, a['href']).to_s
 end
 
 def wikiname(a)
-  href = URI.unescape(a.attr('href').to_s).split('/').last
-  if href.include? 'action=edit'
-    require 'cgi'
-    href = CGI.parse(URI.parse(href).query)['title'].first
-  end
-  href.gsub('_',' ').gsub(/ \([^\)]+\)/,'').strip
+  return if a.attr('class') == 'new' 
+  a.attr('title')
 end
 
 def party_and_coalition(td)
   unknown = { id: "unknown", name: "unknown" }
   return [unknown, unknown] unless td
-  expand = ->(a) { { id: a.text, name: wikiname(a) } }
+  expand = ->(a) { { id: a.text, name: a.xpath('@title').text } }
   return [expand.(td.css('a')), nil] if td.css('a').count == 1 
   return td.css('a').reverse.map { |a| expand.(a) }
 end
@@ -62,12 +58,13 @@ def scrape_term(term, url)
     next unless member
     (party, coalition) = party_and_coalition(tds[3])
     data = { 
-      id: member.attr('title').downcase.gsub(/ /,'-').gsub('-(page-does-not-exist)',''),
+      id: member.attr('title').downcase.gsub(/ /,'_').gsub('_(page_does_not_exist)',''),
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
       constituency: tds[1].text.strip,
       constituency_id: tds[0].text.strip,
-      wikipedia__en: wikilink(member),
+      wikipedia: wikilink(member),
+      wikipedia__en: wikiname(member),
       party_id: party[:id],
       party: party[:name],
       term: term,
@@ -77,7 +74,8 @@ def scrape_term(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    ScraperWiki.save_sqlite([:id, :term], data)
+    puts data
+    ScraperWiki.save_sqlite([:id, :term], data) 
   end
 end
 
