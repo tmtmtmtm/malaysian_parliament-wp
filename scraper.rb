@@ -10,7 +10,7 @@ require 'pry'
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
 
-oldstyle = { 
+terms = { 
   1 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_1st_Malayan_Parliament',
   2 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_2nd_Malaysian_Parliament',
   3 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_3rd_Malaysian_Parliament',
@@ -22,9 +22,6 @@ oldstyle = {
   9 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_9th_Malaysian_Parliament',
   10 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_10th_Malaysian_Parliament',
   11 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_11th_Malaysian_Parliament',
-}
-
-newstyle = { 
   12 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_12th_Malaysian_Parliament',
   13 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament',
 }
@@ -36,7 +33,7 @@ end
 @WIKI = 'http://en.wikipedia.org'
 def wikilink(a)
   return if a.attr('class') == 'new' 
-  URI.join(@WIKI, a['href']).to_s
+  a.attr('title')
 end
 
 def wikiname(a)
@@ -56,48 +53,20 @@ def party_and_coalition(td)
   return td.css('a').reverse.map { |a| expand.(a) }
 end
 
-def scrape_oldstyle_list(term, url)
-  puts "Fetching Parliament #{term}"
+def scrape_term(term, url)
+  puts "Parliament #{term}"
   noko = noko_for(url)
-  noko.xpath('//table[.//th[text()[contains(.,"Member")]]]//tr[td]').each do |row|
+  noko.xpath('//table[.//th[text()[contains(.,"Member")]]]//tr[td[2]]').each do |row|
     tds = row.css('td')
-    member = tds[3].at_xpath('a')
-    (party, coalition) = party_and_coalition(tds[4])
-    data = { 
-      name: member.text.strip,
-      state: tds[0].text.strip,
-      constituency: tds[2].text.strip,
-      constituency_id: tds[1].text.strip,
-      wikipedia: wikilink(member),
-      party_id: party[:id],
-      party: party[:name],
-      term: term,
-      source: url,
-    }
-    data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
-    data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
-    data[:coalition] = coalition[:name] if coalition
-    data[:coalition_id] = coalition[:id] if coalition
-    puts data
-    ScraperWiki.save_sqlite([:name, :term], data)
-  end
-end
-
-# With more time I'd harmonise these two functions, but for a largely
-# one-off scraper it barely seems worth it...
-def scrape_newstyle_list(term, url)
-  puts "Fetching Parliament #{term}"
-  noko = noko_for(url)
-  noko.xpath('//table[.//th[text()[contains(.,"Member")]]]//tr[td]').each do |row|
-    tds = row.css('td')
-    member = tds[2].at_xpath('a') or next
+    member = tds[2].at_xpath('a') rescue nil
+    next unless member
     (party, coalition) = party_and_coalition(tds[3])
     data = { 
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
       constituency: tds[1].text.strip,
       constituency_id: tds[0].text.strip,
-      wikipedia: wikilink(member),
+      wikipedia__en: wikilink(member),
       party_id: party[:id],
       party: party[:name],
       term: term,
@@ -107,17 +76,12 @@ def scrape_newstyle_list(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    puts data
     ScraperWiki.save_sqlite([:name, :term], data)
   end
 end
 
-newstyle.each do |term, url|
-  scrape_newstyle_list(term, url)
-end
-
-oldstyle.each do |term, url|
-  scrape_oldstyle_list(term, url)
+terms.each do |term, url|
+  scrape_term(term, url)
 end
 
 
