@@ -62,7 +62,7 @@ def scrape_term(term, url)
       name: member.text.strip,
       state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
       constituency: tds[1].text.strip,
-      constituency_id: tds[0].text.strip,
+      constituency_id: '%s-%s' % [ tds[0].text.strip, term ],
       wikipedia: wikilink(member),
       wikipedia__en: wikiname(member),
       party_id: party[:id],
