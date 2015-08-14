@@ -44,7 +44,7 @@ end
 def party_and_coalition(td)
   unknown = { id: "unknown", name: "unknown" }
   return [unknown, unknown] unless td
-  expand = ->(a) { { id: a.text, name: a.xpath('@title').text } }
+  expand = ->(a) { { id: a.text, name: a.xpath('@title').text.gsub('(page does not exist)','').strip } }
   return [expand.(td.css('a')), nil] if td.css('a').count == 1 
   return td.css('a').reverse.map { |a| expand.(a) }
 end
@@ -74,8 +74,7 @@ def scrape_term(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
-    puts data
-    ScraperWiki.save_sqlite([:id, :term], data) 
+    ScraperWiki.save_sqlite([:id, :constituency, :term], data) 
   end
 end
 
