@@ -50,9 +50,9 @@ def party_and_coalition(td)
 end
 
 def scrape_term(term, url)
-  puts "Parliament #{term}"
   noko = noko_for(url)
-  noko.xpath('//table[.//th[text()[contains(.,"Member")]]]//tr[td[2]]').each do |row|
+  added = 0
+  noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]').each do |row|
     tds = row.css('td')
     sect = row.xpath('.//preceding::h2[1]').css('span.mw-headline').text.strip
     break if sect.include? 'Public Accounts Committee'
@@ -77,12 +77,15 @@ def scrape_term(term, url)
     data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
     data[:coalition] = coalition[:name] if coalition
     data[:coalition_id] = coalition[:id] if coalition
+    added += 1
     ScraperWiki.save_sqlite([:id, :constituency, :term], data) 
   end
+  return added
 end
 
 terms.each do |term, url|
-  scrape_term(term, url)
+  added = scrape_term(term, url)
+  puts "Term #{term}: #{added}"
 end
 
 
