@@ -83,6 +83,8 @@ def scrape_term(term, url)
   return added
 end
 
+# Start with a clean slate…
+ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 terms.each do |term, url|
   added = scrape_term(term, url)
   puts "Term #{term}: #{added}"
