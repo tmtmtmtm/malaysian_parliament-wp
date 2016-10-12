@@ -52,34 +52,10 @@ end
 def scrape_term(term, url)
   noko = noko_for(url)
   added = 0
-  noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]').each do |row|
-    tds = row.css('td')
-    sect = row.xpath('.//preceding::h2[1]').css('span.mw-headline').text.strip
-    break if sect.include? 'Public Accounts Committee'
 
-    member = tds[2].at_xpath('a') rescue nil
-    next unless member
-    (party, coalition) = party_and_coalition(tds[3])
-    data = { 
-      id: member.attr('title').downcase.gsub(/ /,'_').gsub('_(page_does_not_exist)',''),
-      name: member.text.strip,
-      state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
-      constituency: tds[1].text.strip,
-      constituency_id: '%s-%s' % [ tds[0].text.strip, term ],
-      wikipedia: wikilink(member),
-      wikipedia__en: wikiname(member),
-      party_id: party[:id],
-      party: party[:name],
-      term: term,
-      source: url,
-    }
-    data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
-    data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
-    data[:coalition] = coalition[:name] if coalition
-    data[:coalition_id] = coalition[:id] if coalition
-    added += 1
-    ScraperWiki.save_sqlite([:id, :constituency, :term], data) 
-  end
+  table = Table.new(noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]'))
+  # ScraperWiki.save_sqlite([:id, :constituency, :term], table.members)
+
   return added
 end
 
