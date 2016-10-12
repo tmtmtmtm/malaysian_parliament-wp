@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/everypolitician/field_serializer.git
+  revision: 26d1a15080a4a0ab821ce74652afc16ff86883d5
+  specs:
+    field_serializer (0.1.0)
+
+GIT
   remote: https://github.com/openaustralia/scraperwiki-ruby.git
   revision: fc50176812505e463077d5c673d504a6a234aa78
   branch: morph_defaults
@@ -35,6 +41,7 @@ PLATFORMS
 DEPENDENCIES
   colorize
   execjs
+  field_serializer!
   nokogiri
   open-uri-cached
   pry

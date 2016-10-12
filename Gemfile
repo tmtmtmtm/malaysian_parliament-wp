@@ -13,3 +13,5 @@ gem "colorize"
 gem "nokogiri"
 gem "open-uri-cached"
 gem 'require_all'
+gem 'field_serializer', github: 'everypolitician/field_serializer'
+
