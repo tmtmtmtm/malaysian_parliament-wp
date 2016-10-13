@@ -1,11 +1,7 @@
 require 'nokogiri'
 require_relative 'table'
 
-class Term
-  def initialize(term, url)
-    @term = term
-    @url = url
-  end
+class Term < Page
 
   def to_h
     {
@@ -19,17 +15,7 @@ class Term
 
   private
 
-  attr_reader :url, :term
-
-  def doc
-    @doc ||= noko_for(url)
-  end
-
-  def noko_for(url)
-    Nokogiri::HTML(open(url).read)
-  end
-
   def tables
-    doc.xpath('//h2[span[contains(text(), "Elected members")]]/following-sibling::table')
+    noko.xpath('//h2[span[contains(text(), "Elected members")]]/following-sibling::table')
   end
 end
