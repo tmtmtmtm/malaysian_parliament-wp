@@ -35,7 +35,8 @@ class Row
   end
 
   field :party do
-    party_node.xpath('@title').text rescue 'unknown'
+    return if party_node.nil?
+    party_node.xpath('@title').text
   end
 
   field :party_id do
