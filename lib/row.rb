@@ -60,13 +60,15 @@ class Row
   field :start_date do
     s = tds[0].xpath('small').text
     return unless s.include? 'from'
-    Date.parse(s.split('from')[1].tidy).to_s
+    from_date = s.split('from')[1].tidy.split('until')[0].tidy
+    Date.parse(from_date).to_s
   end
 
   field :end_date do
     s = tds[0].xpath('small').text
     return unless s.include? 'until'
-    Date.parse(s.split('until')[1].tidy).to_s
+    until_date = s.split('until')[1].tidy
+    Date.parse(until_date).to_s rescue until_date
   end
 
   private
