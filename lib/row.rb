@@ -76,14 +76,16 @@ class Row
   attr_reader :tds
 
   def party_node
-    cell = tds[1].xpath('b/a')
-    return cell[0] unless cell.count > 1
+    return affiliation_cell[0] unless affiliation_cell.count > 1
     cell[1]
   end
 
   def coalition_node
-    cell = tds[1].xpath('b/a')
-    return cell[0] unless cell.count < 2
+    return affiliation_cell[0] unless affiliation_cell.count < 2
+  end
+
+  def affiliation_cell
+    tds[1].xpath('b/a')
   end
 
   def wiki_link
