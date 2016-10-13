@@ -75,7 +75,7 @@ class Row
 
   def party_node
     return affiliation_cell[0] unless affiliation_cell.count > 1
-    cell[1]
+    affiliation_cell[1]
   end
 
   def coalition_node
