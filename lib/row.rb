@@ -31,7 +31,8 @@ class Row
   end
 
   field :coalition_id do
-    coalition_node.text rescue 'unkown'
+    return if coalition_node.nil?
+    coalition_node.text
   end
 
   field :party do
