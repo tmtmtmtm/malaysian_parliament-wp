@@ -39,7 +39,8 @@ class Row
   end
 
   field :party_id do
-    party_node.text rescue 'unknowm'
+    return if party_node.nil?
+    party_node.text
   end
 
   field :state do
