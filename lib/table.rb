@@ -5,7 +5,7 @@ class Table
     @table = node
   end
 
-  def to_h
+  def to_a
     constituency = nil
     constituency_id = nil
     table.xpath('.//tr[td]').map do |tr|
