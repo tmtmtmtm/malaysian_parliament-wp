@@ -28,44 +28,17 @@ terms = {
   13 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament',
 }
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read) 
-end
-
-@WIKI = 'http://en.wikipedia.org'
-def wikilink(a)
-  return if a.attr('class') == 'new' 
-  URI.join(@WIKI, a['href']).to_s
-end
-
-def wikiname(a)
-  return if a.attr('class') == 'new' 
-  a.attr('title')
-end
-
-def party_and_coalition(td)
-  unknown = { id: "unknown", name: "unknown" }
-  return [unknown, unknown] unless td
-  expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
-  return [expand.(td.css('a')), nil] if td.css('a').count == 1 
-  return td.css('a').reverse.map { |a| expand.(a) }
-end
-
-def scrape_term(term, url)
-  noko = noko_for(url)
-  added = 0
-
-  table = Table.new(noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]'))
-  # ScraperWiki.save_sqlite([:id, :constituency, :term], table.members)
-
-  return added
+def scrape_term(term_number, url)
+  term = Term.new(url).to_h
+  term[:members].each do |member|
+    member[:term] = term_number
+    ScraperWiki.save_sqlite([:id, :term], member)
+  end
+  puts "Term #{term_number}: #{term[:members].count}"
 end
 
 # Start with a clean slate…
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 terms.each do |term, url|
-  added = scrape_term(term, url)
-  puts "Term #{term}: #{added}"
+  scrape_term(term, url)
 end
-
-
