@@ -27,7 +27,8 @@ class Row
   end
 
   field :coalition do
-    coalition_node.xpath('@title').text rescue 'unknown'
+    return if coalition_node.nil?
+    coalition_node.xpath('@title').text
   end
 
   field :coalition_id do
