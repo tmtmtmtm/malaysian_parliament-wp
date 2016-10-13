@@ -27,19 +27,19 @@ class Row
   end
 
   field :coalition do
-    tds[1].xpath('b/a/@title')[0].text rescue 'unknown'
+    coalition_node.xpath('@title').text rescue 'unknown'
   end
 
   field :coalition_id do
-    tds[1].xpath('b/a')[0].text rescue 'unknown'
+    coalition_node.text rescue 'unkown'
   end
 
   field :party do
-    tds[1].xpath('b/a/@title')[1].text rescue 'unknown'
+    party_node.xpath('@title').text rescue 'unknown'
   end
 
   field :party_id do
-    tds[1].xpath('b/a')[1].text rescue 'unknown'
+    party_node.text rescue 'unknowm'
   end
 
   field :state do
@@ -72,6 +72,17 @@ class Row
   private
 
   attr_reader :tds
+
+  def party_node
+    cell = tds[1].xpath('b/a')
+    return cell[0] unless cell.count > 1
+    cell[1]
+  end
+
+  def coalition_node
+    cell = tds[1].xpath('b/a')
+    return cell[0] unless cell.count < 2
+  end
 
   def wiki_link
     return if wikiless?
