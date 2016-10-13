@@ -58,17 +58,15 @@ class Row
   end
 
   field :start_date do
-    s = tds[0].xpath('small').text
-    return unless s.include? 'from'
-    from_date = s.split('from')[1].tidy.split('until')[0].tidy
-    Date.parse(from_date).to_s
+    return unless date_string.include? 'from'
+    from_date = date_string.split('from')[1].tidy.split('until')[0].tidy
+    date_or_year(from_date)
   end
 
   field :end_date do
-    s = tds[0].xpath('small').text
-    return unless s.include? 'until'
-    until_date = s.split('until')[1].tidy
-    Date.parse(until_date).to_s rescue until_date
+    return unless date_string.include? 'until'
+    until_date = date_string.split('until')[1].tidy
+    date_or_year(until_date)
   end
 
   private
@@ -86,6 +84,20 @@ class Row
 
   def affiliation_cell
     tds[1].xpath('b/a')
+  end
+
+  def date_string
+    tds[0].xpath('small').text
+  end
+
+  def date_or_year(date_str)
+    Date.parse(date_str).to_s rescue year_only(date_str)
+  end
+
+  def year_only(str)
+    m = str.match(/\b((19|20)\d{2})\b/)
+    return unless m
+    m.to_s
   end
 
   def wiki_link
