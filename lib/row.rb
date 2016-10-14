@@ -50,7 +50,9 @@ class Row
   end
 
   field :wikipedia do
-    wiki_link
+    return if wikiless?
+    wiki_base +
+      tds[0].xpath('a/@href').text.tidy
   end
 
   field :wikipedia_en do
@@ -111,12 +113,6 @@ class Row
     m = str.match(/\b((19|20)\d{2})\b/)
     return unless m
     m.to_s
-  end
-
-  def wiki_link
-    return if wikiless?
-    wiki_base +
-      tds[0].xpath('a/@href').text.tidy
   end
 
   def wiki_name
