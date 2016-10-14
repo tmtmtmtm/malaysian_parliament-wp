@@ -29,7 +29,7 @@ terms = {
 }
 
 def scrape_term(term_number, url)
-  term = Term.new(url).to_h
+  term = TermPage.new(url).to_h
   term[:members].each do |member|
     member[:term] = term_number
     ScraperWiki.save_sqlite([:id, :term], member)

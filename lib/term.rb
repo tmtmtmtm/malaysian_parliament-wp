@@ -1,7 +1,7 @@
 require 'nokogiri'
 require_relative 'table'
 
-class Term < Page
+class TermPage < Page
 
   field :members do
     tables.map do |table|
