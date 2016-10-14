@@ -15,11 +15,7 @@ class Row
   end
 
   field :id do
-    tds[0].xpath('a/@title')
-          .text
-          .downcase
-          .gsub(/ /,'_')
-          .gsub('_(page_does_not_exist)','')
+    id_from_anchor || id_from_name
   end
 
   field :name do
@@ -76,6 +72,19 @@ class Row
   private
 
   attr_reader :tds
+
+  def id_from_anchor
+    tds[0].xpath('a/@title')
+          .text
+          .downcase
+          .gsub(/ /,'_')
+          .gsub('_(page_does_not_exist)','')
+    rescue nil
+  end
+
+  def id_from_name
+    tds[0].xpath('a').text.tidy.downcase.tr(' ', '_')
+  end
 
   def party_node
     return affiliation_cell[0] unless affiliation_cell.count > 1
