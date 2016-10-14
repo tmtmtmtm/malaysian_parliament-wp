@@ -56,7 +56,8 @@ class Row
   end
 
   field :wikipedia_en do
-    wiki_name
+    return if wikiless?
+    tds[0].xpath('a/@title').text.tidy
   end
 
   field :start_date do
@@ -113,11 +114,6 @@ class Row
     m = str.match(/\b((19|20)\d{2})\b/)
     return unless m
     m.to_s
-  end
-
-  def wiki_name
-    return if wikiless?
-    tds[0].xpath('a/@title').text.tidy
   end
 
   def wiki_base
