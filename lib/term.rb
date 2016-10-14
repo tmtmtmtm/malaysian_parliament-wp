@@ -4,9 +4,7 @@ require_relative 'table'
 class TermPage < Page
 
   field :members do
-    tables.map do |node|
-      Table.new(node).to_a
-    end.flatten
+    tables.flat_map { |node| Table.new(node).to_a }
   end
 
   private
