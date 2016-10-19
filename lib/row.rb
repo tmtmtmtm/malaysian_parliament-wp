@@ -43,9 +43,8 @@ class Row
   end
 
   field :state do
-    tds.xpath('./preceding::h3[1]')
+    tds.xpath('./preceding::h3[1]/span[1]')
        .text
-       .gsub('[edit]', '')
        .tidy
   end
 
