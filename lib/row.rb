@@ -14,17 +14,6 @@ class Row
     @tds = tds
   end
 
-  def to_h
-    # A table on the term 12 page lists
-    # the member name of a vacant seat
-    # as 'vacant'... Since we don't want
-    # a member called 'vacant', we
-    # do not return member data for this
-    # row.
-    return super unless vacant
-    {}
-  end
-
   field :id do
     id_from_anchor || id_from_name
   end
