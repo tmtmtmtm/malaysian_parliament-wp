@@ -23,6 +23,7 @@ class Members
     constituency_id = tds.shift.text.strip if tds.count > 2
     constituency = tds.shift.text.strip if tds.count > 2
     row = Row.new(tds).to_h.merge(constituency: constituency, constituency_id: constituency_id)
+    row = {} if row[:name].include? 'Vacant'
     return row unless row.count < 3
   end
 end
