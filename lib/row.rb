@@ -51,12 +51,12 @@ class Row
   field :wikipedia do
     return if wikiless?
     wiki_base +
-      tds[-2].xpath('a/@href').text.tidy
+      name_cell.xpath('a/@href').text.tidy
   end
 
   field :wikipedia_en do
     return if wikiless?
-    tds[-2].xpath('a/@title').text.tidy
+    name_cell.xpath('a/@title').text.tidy
   end
 
   field :start_date do
@@ -76,7 +76,7 @@ class Row
   attr_reader :tds
 
   def id_from_anchor
-    tds[-2].xpath('a/@title')
+    name_cell.xpath('a/@title')
           .text
           .downcase
           .gsub(/ /,'_')
@@ -85,7 +85,7 @@ class Row
   end
 
   def id_from_name
-    tds[-2].xpath('a').text.tidy.downcase.tr(' ', '_')
+    name_cell.xpath('a').text.tidy.downcase.tr(' ', '_')
   end
 
   def party_node
@@ -101,8 +101,12 @@ class Row
     tds[-1].xpath('b/a')
   end
 
+  def name_cell
+    tds[-2]
+  end
+
   def date_string
-    tds[-2].xpath('small').text
+    name_cell.xpath('small').text
   end
 
   def date_or_year(date_str)
@@ -120,6 +124,6 @@ class Row
   end
 
   def wikiless?
-    tds[-2].xpath('a/@class').text == 'new'
+    name_cell.xpath('a/@class').text == 'new'
   end
 end
