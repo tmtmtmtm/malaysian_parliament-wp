@@ -1,5 +1,5 @@
 require 'nokogiri'
-require_relative 'table'
+require_relative 'members'
 
 class TermPage < Page
 
