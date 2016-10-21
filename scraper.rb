@@ -5,6 +5,8 @@ require 'scraperwiki'
 require 'nokogiri'
 require 'open-uri'
 require 'uri'
+require 'require_all'
+require_rel 'lib'
 
 require 'pry'
 require 'open-uri/cached'
@@ -26,68 +28,17 @@ terms = {
   13 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament',
 }
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read) 
-end
-
-@WIKI = 'http://en.wikipedia.org'
-def wikilink(a)
-  return if a.attr('class') == 'new' 
-  URI.join(@WIKI, a['href']).to_s
-end
-
-def wikiname(a)
-  return if a.attr('class') == 'new' 
-  a.attr('title')
-end
-
-def party_and_coalition(td)
-  unknown = { id: "unknown", name: "unknown" }
-  return [unknown, unknown] unless td
-  expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
-  return [expand.(td.css('a')), nil] if td.css('a').count == 1 
-  return td.css('a').reverse.map { |a| expand.(a) }
-end
-
-def scrape_term(term, url)
-  noko = noko_for(url)
-  added = 0
-  noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]').each do |row|
-    tds = row.css('td')
-    sect = row.xpath('.//preceding::h2[1]').css('span.mw-headline').text.strip
-    break if sect.include? 'Public Accounts Committee'
-
-    member = tds[2].at_xpath('a') rescue nil
-    next unless member
-    (party, coalition) = party_and_coalition(tds[3])
-    data = { 
-      id: member.attr('title').downcase.gsub(/ /,'_').gsub('_(page_does_not_exist)',''),
-      name: member.text.strip,
-      state: row.xpath('.//preceding::h3[1]').css('span.mw-headline').text.strip,
-      constituency: tds[1].text.strip,
-      constituency_id: '%s-%s' % [ tds[0].text.strip, term ],
-      wikipedia: wikilink(member),
-      wikipedia__en: wikiname(member),
-      party_id: party[:id],
-      party: party[:name],
-      term: term,
-      source: url,
-    }
-    data[:area] = [data[:constituency], data[:state]].reject(&:empty?).compact.join(", ")
-    data[:party_id] = 'PKR' if data[:party_id] == 'KeADILan'
-    data[:coalition] = coalition[:name] if coalition
-    data[:coalition_id] = coalition[:id] if coalition
-    added += 1
-    ScraperWiki.save_sqlite([:id, :constituency, :term], data) 
+def scrape_term(term_number, url)
+  term = TermPage.new(url).to_h
+  term[:members].each do |member|
+    member[:term] = term_number
+    ScraperWiki.save_sqlite([:id, :term], member)
   end
-  return added
+  puts "Term #{term_number}: #{term[:members].count}"
 end
 
 # Start with a clean slate…
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 terms.each do |term, url|
-  added = scrape_term(term, url)
-  puts "Term #{term}: #{added}"
+  scrape_term(term, url)
 end
-
-
