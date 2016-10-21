@@ -75,10 +75,6 @@ class Row
 
   attr_reader :tds
 
-  def vacant
-    tds[-2].text.include?('Vacant')
-  end
-
   def id_from_anchor
     tds[-2].xpath('a/@title')
           .text
