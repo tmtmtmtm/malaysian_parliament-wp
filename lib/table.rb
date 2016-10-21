@@ -1,6 +1,6 @@
 require_relative 'row'
 
-class Table
+class Members
   def initialize(node)
     @table = node
   end
