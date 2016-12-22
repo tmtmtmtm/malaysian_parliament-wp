@@ -31,10 +31,9 @@ def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
 
-@WIKI = 'http://en.wikipedia.org'
 def wikilink(a)
   return if a.attr('class') == 'new'
-  URI.join(@WIKI, a['href']).to_s
+  URI.join('http://en.wikipedia.org/', a['href']).to_s
 end
 
 def wikiname(a)
