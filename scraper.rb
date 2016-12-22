@@ -49,13 +49,12 @@ def party_and_coalition(td)
   td.css('a').reverse.map { |a| expand.call(a) }
 end
 
+
 def scrape_term(term, url)
   noko = noko_for(url)
   added = 0
   noko.xpath('//table[.//th[.="Member"]]//tr[td[2]]').each do |row|
     tds = row.css('td')
-    sect = row.xpath('.//preceding::h2[1]').css('span.mw-headline').text.strip
-    break if sect.include? 'Public Accounts Committee'
 
     member = tds[2].at_xpath('a') rescue nil
     next unless member
