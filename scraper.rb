@@ -32,6 +32,10 @@ terms = {
   13 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament',
 }
 
+historical_revision = {
+  13 => 'https://en.wikipedia.org/w/index.php?title=Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament&oldid=608968807'
+}
+
 def noko_for(url)
   Nokogiri::HTML(open(url).read)
 end
@@ -155,7 +159,8 @@ end
 
 # Start with a clean slate…
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
-terms.each do |term, url|
-  added = scrape_term(term, url)
-  puts "Term #{term}: #{added}"
+[terms, historical_revision].each do |arr|
+  arr.each do |term, url|
+    scrape_term(term, url)
+  end
 end
