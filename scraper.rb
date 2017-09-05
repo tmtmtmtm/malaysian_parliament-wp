@@ -121,8 +121,10 @@ class MembershipRow < Scraped::HTML
 
   def party_and_coalition
     unknown = { id: 'unknown', name: 'unknown' }
+    independent = { id: 'IND', name: 'Independent' }
     binding.pry unless td = tds[3]
     return [] if tds[3].text == 'VAC'
+    return [independent, independent] if tds[3].text == 'IND'
     #return [unknown, unknown] if td.css('a').count == 0
     binding.pry if td.css('a').count == 0
     expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
