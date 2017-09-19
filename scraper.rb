@@ -142,7 +142,7 @@ class ListPage < Scraped::HTML
   end
 end
 
-def scrape_term(_term, url)
+def scrape_term(url)
   page = ListPage.new(response: Scraped::Request.new(url: url).response)
   # TODO: can remove the reject once everything is consistent
   data = page.members.reject(&:vacant?).map { |m| m.to_h.reject { |_, v| v.to_s.empty? } }
@@ -154,6 +154,6 @@ end
 # Start with a clean slate
 ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
 terms.each do |term, url|
-  added = scrape_term(term, url)
+  added = scrape_term(url)
   puts "Term #{term}: #{added}"
 end
