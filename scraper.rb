@@ -137,7 +137,7 @@ class ListPage < Scraped::HTML
   decorator RemovePartyCounts
   decorator UnspanAllTables
   decorator RemoveNotes
-  decorator Scraped::Response::Decorator::AbsoluteUrls
+  decorator Scraped::Response::Decorator::CleanUrls
 
   field :members do
     noko.xpath('//table[.//th[.="Member"]]//tr[td[4]]').reject { |tr| tr.css('td').first.text == tr.css('td').last.text }.map do |row|
