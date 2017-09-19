@@ -40,7 +40,7 @@ class MembershipRow < Scraped::HTML
   end
 
   field :name do
-    member ? member.text.strip : tds[2].text.strip
+    member&.text.strip || tds[2].text.strip
   end
 
   field :state do
