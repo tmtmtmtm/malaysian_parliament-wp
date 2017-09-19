@@ -142,18 +142,13 @@ class ListPage < Scraped::HTML
   end
 end
 
-def scrape_term(url)
+def term_data(url)
   page = ListPage.new(response: Scraped::Request.new(url: url).response)
   # TODO: can remove the reject once everything is consistent
-  data = page.members.reject(&:vacant?).map { |m| m.to_h.reject { |_, v| v.to_s.empty? } }
-  data.each { |mem| puts mem.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h } if ENV['MORPH_DEBUG']
-  ScraperWiki.save_sqlite(%i[id constituency term], data)
-  data.count
+  page.members.reject(&:vacant?).map { |m| m.to_h.reject { |_, v| v.to_s.empty? } }
 end
 
-# Start with a clean slate
 ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
-terms.each do |term, url|
-  added = scrape_term(url)
-  puts "Term #{term}: #{added}"
-end
+data = terms.flat_map { |term, url| term_data(url) }
+data.each { |mem| puts mem.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h } if ENV['MORPH_DEBUG']
+ScraperWiki.save_sqlite(%i[id constituency term], data)
