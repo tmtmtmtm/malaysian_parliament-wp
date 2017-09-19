@@ -2,12 +2,10 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require 'nokogiri'
-require 'open-uri'
 require 'pry'
 require 'scraped'
 require 'scraperwiki'
-require 'uri'
+require 'wikidata_ids_decorator'
 
 require_rel 'lib/remove_notes'
 require_rel 'lib/remove_party_counts'
@@ -53,6 +51,10 @@ class MembershipRow < Scraped::HTML
 
   field :constituency_id do
     '%s-%s' % [tds[0].text.strip, term]
+  end
+
+  field :wikidata do
+    tds[2].css('a/@wikidata').text
   end
 
   field :wikipedia do
@@ -134,6 +136,7 @@ class ListPage < Scraped::HTML
   decorator UnspanAllTables
   decorator RemoveNotes
   decorator Scraped::Response::Decorator::CleanUrls
+  decorator WikidataIdsDecorator::Links
 
   field :members do
     noko.xpath('//table[.//th[.="Member"]]//tr[td[4]]').reject { |tr| tr.css('td').first.text == tr.css('td').last.text }.map do |row|
