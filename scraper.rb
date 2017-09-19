@@ -32,10 +32,6 @@ terms = {
   13 => 'https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_13th_Malaysian_Parliament',
 }
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read)
-end
-
 class MembershipRow < Scraped::HTML
   field :id do
     to_slugify = member ? member.attr('title') : tds[2].text
