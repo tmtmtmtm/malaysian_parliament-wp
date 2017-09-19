@@ -61,9 +61,9 @@ class MembershipRow < Scraped::HTML
 
   field :wikipedia do
     href = tds[2].xpath('.//a[not(@class="new")]/@href') or return
-    # TODO make this absolute again. This version is just to make sure
+    # TODO: make this absolute again. This version is just to make sure
     # we have minimal diffs
-    href.text.sub('https','http')
+    href.text.sub('https', 'http')
   end
 
   field :wikipedia__en do
@@ -82,7 +82,7 @@ class MembershipRow < Scraped::HTML
   end
 
   field :term do
-    url.sub('https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_','').to_i
+    url.sub('https://en.wikipedia.org/wiki/Members_of_the_Dewan_Rakyat,_', '').to_i
   end
 
   field :source do
@@ -125,8 +125,8 @@ class MembershipRow < Scraped::HTML
     binding.pry unless td = tds[3]
     return [] if tds[3].text == 'VAC'
     return [independent, independent] if tds[3].text == 'IND'
-    #return [unknown, unknown] if td.css('a').count == 0
-    binding.pry if td.css('a').count == 0
+    # return [unknown, unknown] if td.css('a').count.zero?
+    binding.pry if td.css('a').count.zero?
     expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
     return [expand.call(td.css('a')), nil] if td.css('a').count == 1
     td.css('a').reverse.map { |a| expand.call(a) }
@@ -146,12 +146,12 @@ class ListPage < Scraped::HTML
   end
 end
 
-def scrape_term(term, url)
+def scrape_term(_term, url)
   page = ListPage.new(response: Scraped::Request.new(url: url).response)
   # TODO: can remove the reject once everything is consistent
-  data = page.members.reject { |m| m.vacant? }.map { |m| m.to_h.reject { |_,v| v.to_s.empty? } }
+  data = page.members.reject(&:vacant?).map { |m| m.to_h.reject { |_, v| v.to_s.empty? } }
   # puts data
-  ScraperWiki.save_sqlite(%i(id constituency term), data)
+  ScraperWiki.save_sqlite(%i[id constituency term], data)
   data.count
 end
 
