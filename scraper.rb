@@ -150,7 +150,7 @@ def scrape_term(_term, url)
   page = ListPage.new(response: Scraped::Request.new(url: url).response)
   # TODO: can remove the reject once everything is consistent
   data = page.members.reject(&:vacant?).map { |m| m.to_h.reject { |_, v| v.to_s.empty? } }
-  # puts data
+  data.each { |mem| puts mem.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h } if ENV['MORPH_DEBUG']
   ScraperWiki.save_sqlite(%i[id constituency term], data)
   data.count
 end
