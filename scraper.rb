@@ -139,7 +139,7 @@ class ListPage < Scraped::HTML
   decorator WikidataIdsDecorator::Links
 
   field :members do
-    noko.xpath('//table[.//th[.="Member"]]//tr[td[4]]').reject { |tr| tr.css('td').first.text == tr.css('td').last.text }.map do |row|
+    noko.xpath('//table[.//th[contains(.,"Member")]]//tr[td[4]]').reject { |tr| tr.css('td').first.text == tr.css('td').last.text }.map do |row|
       fragment row => MembershipRow
     end
   end
