@@ -32,13 +32,13 @@ terms = {
 
 class MembershipRow < Scraped::HTML
   field :id do
-    to_slugify = member ? member.attr('title') : tds[2].text
+    to_slugify = member ? member.attr('title') : tds[2].text.tidy
     binding.pry if to_slugify.downcase.include? 'party'
     to_slugify.downcase.tr(' ', '_').gsub('_(page_does_not_exist)', '')
   end
 
   field :name do
-    member.text.strip
+    member.text.tidy
   end
 
   field :state do
@@ -46,11 +46,11 @@ class MembershipRow < Scraped::HTML
   end
 
   field :constituency do
-    tds[1].text.strip
+    tds[1].text.tidy
   end
 
   field :constituency_id do
-    '%s-%s' % [tds[0].text.strip, term]
+    '%s-%s' % [tds[0].text.tidy, term]
   end
 
   field :wikidata do
@@ -100,7 +100,7 @@ class MembershipRow < Scraped::HTML
   end
 
   def vacant?
-    tds[3].text == 'VAC' rescue binding.pry
+    tds[3].text.tidy == 'VAC'
   end
 
   private
@@ -121,8 +121,8 @@ class MembershipRow < Scraped::HTML
     unknown = { id: 'unknown', name: 'unknown' }
     independent = { id: 'IND', name: 'Independent' }
     binding.pry unless td = tds[3]
-    return [] if tds[3].text == 'VAC'
-    return [independent, independent] if tds[3].text == 'IND'
+    return [] if vacant?
+    return [independent, independent] if tds[3].text.tidy == 'IND'
     # return [unknown, unknown] if td.css('a').count.zero?
     binding.pry if td.css('a').count.zero?
     expand = ->(a) { { id: a.text, name: a.xpath('@title').text.split('(').first.strip } }
