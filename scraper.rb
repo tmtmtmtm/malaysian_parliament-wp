@@ -110,7 +110,7 @@ class MembershipRow < Scraped::HTML
   end
 
   def member
-    @member ||= tds[2].at_xpath('a')
+    @member ||= tds[2].at_xpath('a') || tds[2]
   end
 
   def coalition_data
